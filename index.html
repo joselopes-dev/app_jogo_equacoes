@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jogo de Lógica - Tabuleiro 5x5</title>
+  <style>
+
+    html {
+      height: 100%;  
+    }
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin: 20px;
+      background-image: url('tela_fundo.png');
+      background-repeat: no-repeat;
+      background-size: cover;
+      color: #fff;
+    }
+    table {
+      margin: 20px auto;
+      border-collapse: collapse;
+    }
+    td, th {
+      width: 50px;
+      height: 50px;
+      border: 1px solid #fff;
+      text-align: center;
+      font-size: 18px;
+    }
+    td.filled {
+      background-color: #dff0d8;
+      color: #008000;
+    }
+    .instructions {
+      font-size: 18px;
+      margin: 15px 0;
+    }
+    button, select {
+      margin: 10px;
+      padding: 10px;
+      font-size: 15px;
+      cursor: pointer;
+    }
+    input {
+      width: 50px;
+      font-size: 16px;
+      text-align: center;
+    }
+    #message {
+      margin: 20px;
+      font-size: 20px;
+      font-weight: bold;
+    }
+    .error {
+      color: red;
+    }
+    .success {
+      color: green;
+    }
+
+    @media (max-width: 480px ){
+      button, select {
+        font-size: 13px; 
+    }
+
+    button {
+      margin: 40px 20px 0px 20px;
+      padding: 10px;
+      width: 100px;
+      border-radius: 5px;
+    }
+
+    button:hover {
+      background-color: orange;
+      color: #fff;
+    }
+
+    .instructions {
+        font-size: 12px; 
+        font-weight: bold;
+    }
+
+    #a, #b, #c, #d, #e {
+        width: 32px;
+    }
+
+    #message {
+        font-size: 15px; 
+        font-weight: bold;
+    }
+    .success {
+        font-size: 30px; 
+        font-weight: bold;
+    }
+}
+
+  </style>
+</head>
+<body>
+  <h1>Jogo de Lógica</h1>
+  
+  <!-- Seletor de jogos -->
+  <label for="gameSelector" style="font-weight: bold;">Escolha o jogo:</label>
+  <select id="gameSelector" onchange="changeGame()">
+    <option value="1">Jogo 1: Soma Simples</option>
+    <option value="2">Jogo 2: Soma dos Produtos</option>
+    <option value="3">Jogo 3: Diferenças e Somas</option>
+    <option value="4">Jogo 4: Combinação de operações 1</option>
+    <option value="5">Jogo 5: Combinação de operações 2</option>
+  </select>
+
+  <p class="instructions" id="instructions">Atribua os valores para A, B, C, D e E e respeite as equações apresentadas!</p>
+
+  <!-- Grade 5x5 -->
+  <table>
+    <tr>
+      <th></th>
+      <th>1</th>
+      <th>2</th>
+      <th>3</th>
+      <th>4</th>
+      <th>5</th>
+    </tr>
+    <tr>
+      <th>A</th>
+      <td id="a1"></td>
+      <td id="a2"></td>
+      <td id="a3"></td>
+      <td id="a4"></td>
+      <td id="a5"></td>
+    </tr>
+    <tr>
+      <th>B</th>
+      <td id="b1"></td>
+      <td id="b2"></td>
+      <td id="b3"></td>
+      <td id="b4"></td>
+      <td id="b5"></td>
+    </tr>
+    <tr>
+      <th>C</th>
+      <td id="c1"></td>
+      <td id="c2"></td>
+      <td id="c3"></td>
+      <td id="c4"></td>
+      <td id="c5"></td>
+    </tr>
+    <tr>
+      <th>D</th>
+      <td id="d1"></td>
+      <td id="d2"></td>
+      <td id="d3"></td>
+      <td id="d4"></td>
+      <td id="d5"></td>
+    </tr>
+    <tr>
+      <th>E</th>
+      <td id="e1"></td>
+      <td id="e2"></td>
+      <td id="e3"></td>
+      <td id="e4"></td>
+      <td id="e5"></td>
+    </tr>
+  </table>
+
+  <!-- Inputs -->
+  <label>A: <input type="number" id="a" min="0"></label>
+  <label>B: <input type="number" id="b" min="0"></label>
+  <label>C: <input type="number" id="c" min="0"></label>
+  <label>D: <input type="number" id="d" min="0"></label>
+  <label>E: <input type="number" id="e" min="0"></label>
+
+  <br>
+  <button onclick="validateGame()">Validar</button>
+  <button onclick="resetGame()">Resetar</button>
+
+  <div id="message"></div>
+
+  <script>
+   let currentGame = 1;
+
+document.addEventListener("DOMContentLoaded", () => {
+  changeGame(); // Inicializa as instruções do primeiro jogo
+});
+
+function changeGame() {
+  currentGame = parseInt(document.getElementById("gameSelector").value);
+  resetGame();
+  const instructions = document.getElementById("instructions");
+  if (currentGame === 1) instructions.textContent = "B + C + D = 11 | B + E = 3 | A + B + C = 10";
+  else if (currentGame === 2) instructions.textContent = "A × B = 12 | C x D = 20 | A + C − E = 6";
+  else if (currentGame === 3) instructions.textContent = "A + B = 7 | C - D = 1 | A + B + C + D + E = 15";
+  else if (currentGame === 4) instructions.textContent = "A x B = 6 | C ÷ D = 2 | A + B + C + D + E = 13";
+  else if (currentGame === 5) instructions.textContent = "A + B = 6 | C × D = 6 | E − A = 3 | A + B + C + D + E = 15";
+}
+
+    function validateGame() {
+      const a = parseInt(document.getElementById("a").value) || 0;
+      const b = parseInt(document.getElementById("b").value) || 0;
+      const c = parseInt(document.getElementById("c").value) || 0;
+      const d = parseInt(document.getElementById("d").value) || 0;
+      const e = parseInt(document.getElementById("e").value) || 0;
+
+      let valid = false;
+      let errorMessages = [];
+
+      if (currentGame === 1) {
+        valid = (b + c + d === 11) && (b + e === 3) && (a + b + c === 10);
+        if (b + c + d !== 11) errorMessages.push("B + C + D precisa ser igual a 11.");
+        if (b + e !== 3) errorMessages.push("B + E precisa ser igual a 3.");
+        if (a + b + c !== 10) errorMessages.push("A + B + C precisa ser igual a 10.");
+      } else if (currentGame === 2) {
+        valid = (a * b === 12) && (c * d === 20) && (a + c - e === 6);
+        if (a * b !== 12) errorMessages.push("A × B precisa ser igual a 12.");
+        if (c * d !== 20) errorMessages.push("C × D precisa ser igual a 20.");
+        if (a + c + e !== 15) errorMessages.push("A + C − E precisa ser igual a 6.");
+      } else if (currentGame === 3) {
+        valid = (a + b === 7) && (c - d === 1) && (a + b + c + d + e === 15);
+        if (a + b !== 7) errorMessages.push("A + B precisa ser igual a 7.");
+        if (c - d !== 1) errorMessages.push("C - D precisa ser igual a 1.");
+        if (a + b + c + d + e !== 15) errorMessages.push("A + B + C + D + E precisa ser igual a 15.");
+      } else if (currentGame === 4) {
+        valid = (a * b === 6) && (c / d === 2) && (a + b + c + d + e === 13);
+        if (a * c !== 6) errorMessages.push("A * C precisa ser igual a 6.");
+        if (c / d !== 2) errorMessages.push("C / D precisa ser igual a 2.");
+        if (a + b + c + d + e !== 13) errorMessages.push("A + B + C + D + E precisa ser igual a 13.");
+      } else if (currentGame === 5) {
+        valid = (a + b === 6) && (c * d === 6) && (e - a === 3) (a + b + c + d + e === 15);
+        if (a + b !== 6) errorMessages.push("A + b precisa ser igual a 6.");
+        if (c * d !== 6) errorMessages.push("C * D precisa ser igual a 6.");
+        if (a + b + c + d + e !== 15) errorMessages.push("A + B + C + D + E precisa ser igual a 15.");
+      }
+
+      if (valid) {
+        document.getElementById("message").innerHTML = "<span class='success'>Parabéns! 🎉</span>";
+        updateCartesian(a, b, c, d, e);
+      } else {
+        document.getElementById("message").innerHTML = `<span class='error'>${errorMessages.join("<br>")}</span>`;
+      }
+    }
+
+    function updateCartesian(a, b, c, d, e) {
+  resetTable();
+
+  // Posicionamento para os diferentes jogos
+  if (currentGame === 1) {
+    document.getElementById("a3").textContent = a;
+    document.getElementById("b2").textContent = b;
+    document.getElementById("c5").textContent = c;
+    document.getElementById("d4").textContent = d;
+    document.getElementById("e1").textContent = e;
+
+    ["a3", "b2", "c5", "d4", "e1"].forEach(id => {
+      document.getElementById(id).classList.add("filled");
+    });
+  } else if (currentGame === 2) {
+    document.getElementById("a3").textContent = a;
+    document.getElementById("b4").textContent = b;
+    document.getElementById("c5").textContent = c;
+    document.getElementById("d4").textContent = d;
+    document.getElementById("e2").textContent = e;
+
+    ["a3", "b4", "c5", "d4", "e2"].forEach(id => {
+      document.getElementById(id).classList.add("filled");
+    });
+  } else if (currentGame === 3) {
+    document.getElementById("a5").textContent = a;
+    document.getElementById("b2").textContent = b;
+    document.getElementById("c4").textContent = c;
+    document.getElementById("d3").textContent = d;
+    document.getElementById("e1").textContent = e;
+
+    ["a5", "b2", "c4", "d3", "e1"].forEach(id => {
+      document.getElementById(id).classList.add("filled");
+    });
+  } else if (currentGame === 4) {
+    document.getElementById("a2").textContent = a;
+    document.getElementById("b3").textContent = b;
+    document.getElementById("c4").textContent = c;
+    document.getElementById("d2").textContent = d;
+    document.getElementById("e2").textContent = e;
+
+    ["a2", "b3", "c4", "d2", "e2"].forEach(id => {
+      document.getElementById(id).classList.add("filled");
+    });
+  } else if (currentGame === 5) {
+    document.getElementById("a1").textContent = a;
+    document.getElementById("b5").textContent = b;
+    document.getElementById("c2").textContent = c;
+    document.getElementById("d3").textContent = d;
+    document.getElementById("e4").textContent = e;
+
+    ["a1", "b5", "c2", "d3", "e4"].forEach(id => {
+      document.getElementById(id).classList.add("filled");
+    });
+  }
+}
+
+
+    function resetGame() {
+      document.querySelectorAll("input").forEach(input => input.value = "");
+      resetTable();
+      document.getElementById("message").textContent = "";
+    }
+
+    function resetTable() {
+      document.querySelectorAll("td").forEach(td => {
+        td.textContent = "";
+        td.classList.remove("filled");
+      });
+    }
+
+    function validateGame() {
+  const a = parseInt(document.getElementById("a").value) || 0;
+  const b = parseInt(document.getElementById("b").value) || 0;
+  const c = parseInt(document.getElementById("c").value) || 0;
+  const d = parseInt(document.getElementById("d").value) || 0;
+  const e = parseInt(document.getElementById("e").value) || 0;
+
+  let valid = false;
+  let errorMessages = [];
+
+  // Valores corretos definidos
+  const correctValues = {
+    1: { a: 3, b: 2, c: 5, d: 4, e: 1 },
+    2: { a: 3, b: 4, c: 5, d: 4, e: 2 },
+    3: { a: 5, b: 2, c: 4, d: 3, e: 1 },
+    4: { a: 2, b: 3, c: 4, d: 2, e: 2 },
+    5: { a: 1, b: 5, c: 2, d: 3, e: 4 },
+  };
+
+  const correct = correctValues[currentGame];
+
+  // Validação estrita dos valores
+  if (
+    a === correct.a &&
+    b === correct.b &&
+    c === correct.c &&
+    d === correct.d &&
+    e === correct.e
+  ) {
+    valid = true;
+  } else {
+    if (a !== correct.a) errorMessages.push(`Valor de 'A' não corresponde.`);
+    if (b !== correct.b) errorMessages.push(`Valor de 'B' não corresponde.`);
+    if (c !== correct.c) errorMessages.push(`Valor de 'C' não corresponde.`);
+    if (d !== correct.d) errorMessages.push(`Valor de 'D' não corresponde.`);
+    if (e !== correct.e) errorMessages.push(`Valor de 'E' não corresponde.`);
+  }
+
+  // Exibição da mensagem
+  if (valid) {
+    document.getElementById("message").innerHTML = "<span class='success'>Parabéns! 🎉</span>";
+    updateCartesian(a, b, c, d, e);
+  } else {
+    document.getElementById("message").innerHTML = `<span class='error'>${errorMessages.join("<br>")}</span>`;
+  }
+}
+
+  </script>
+</body>
+</html>
